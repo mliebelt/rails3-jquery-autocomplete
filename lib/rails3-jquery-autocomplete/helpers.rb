@@ -81,12 +81,22 @@ module Rails3JQueryAutocomplete
     #
     #   items = get_autocomplete_items(:model => get_object(object), :options => options, :term => term, :method => method) 
     #
+    # Added the option to scope the query by doing something like that in the controller
+    #
+    #   autocomplete :super_task, :title, :limit => 1000, :full => true, :scope => :valid, :class_name => Task
+    #
+    # Of course you have to define the scope in the model class Task like that:
+    #
+    #   scope :valid, lambda { where(:valid => true) }
+    #
     def get_autocomplete_items(parameters)
       model = parameters[:model]
       method = parameters[:method]
       options = parameters[:options]
       term = parameters[:term]
       is_full_search = options[:full]
+      scope = options[:scope]
+      model = model.send(scope) if scope
 
       limit = get_autocomplete_limit(options)
       implementation = get_implementation(model)
